@@ -23,15 +23,21 @@ namespace FixDocType
                 Error("Only MS Word document with .docx extension are supported.");
                 return;
             }
+            try
+            {
+                var content = File.ReadAllBytes(fileInfo.FullName);
+                var serializer = new DocumentSerializer(content);
+                serializer.Fix();
 
-            var content = File.ReadAllBytes(fileInfo.FullName);
-            var serializer = new DocumentSerializer(content);
-            serializer.Fix();
+                var newFileName = fileInfo.FullName.Replace(fileInfo.Extension, "_fixed" + fileInfo.Extension);
 
-            var newFileName = fileInfo.FullName.Replace(fileInfo.Extension, "_fixed" + fileInfo.Extension);
-
-            File.WriteAllBytes(newFileName, serializer.ToBytes());
-            Console.WriteLine("MS Word file '{0}' fixed successfully.", newFileName);
+                File.WriteAllBytes(newFileName, serializer.ToBytes());
+                Console.WriteLine("MS Word file '{0}' fixed successfully.", newFileName);
+            }
+            catch (Exception ex)
+            {
+                Error(ex.ToString());
+            }
             Console.ReadKey();
         }
 
